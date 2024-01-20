@@ -15,7 +15,6 @@ import path from 'path'
         useOrmContainer(Container)
         useRoutingControllerContainer(Container)
 
-        console.log('test')
         // initialize database connection
         await dataSource.initialize()
         console.log('[typeorm] Connected to database')
