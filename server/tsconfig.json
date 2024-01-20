@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": [
+      "es5",
+      "es6",
+      "es2015.core",
+      "es2015.collection",
+      "es2015.generator",
+      "es2015.iterable",
+      "es2015.promise",
+      "es2015.proxy",
+      "es2015.reflect",
+      "es2015.symbol",
+      "es2015.symbol.wellknown",
+      "esnext.asynciterable"
+    ],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "removeComments": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": false,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": false,
+    "alwaysStrict": true,
+    "noUnusedLocals": false,
+    "noImplicitReturns": true,
+    "skipLibCheck": true
+  }
+}

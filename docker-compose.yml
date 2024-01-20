@@ -1,0 +1,39 @@
+services:
+  server:
+    container_name: cf_server
+    build: .
+    depends_on:
+      - db
+    command: npm run dev
+    environment:
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_HOST: db
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      SERVER_PORT: ${SERVER_PORT}
+      SERVER_ROUTES_PREFIX: ${SERVER_ROUTES_PREFIX}
+      NODE_ENV: development
+
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    working_dir: /server
+    volumes:
+      - ./server:/server
+    stdin_open: true
+    tty: true
+
+  db:
+    container_name: cf_postgres
+    image: postgres:15-alpine
+    restart: always
+    ports:
+      - ${DB_HOST_PORT}:${DB_PORT}
+    volumes:
+      - data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+volumes:
+  data:
