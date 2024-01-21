@@ -30,7 +30,7 @@ export class CompanyRepository extends BaseRepository<Company> {
         })
     }
 
-    async findSimilar(companyId: number, limit?: number): Promise<Company & {rank: number}[]> {
+    async findSimilar(companyId: number, limit?: number, offset?: number): Promise<Company & {rank: number}[]> {
         return await this.manager.query(`
             -- calc difference of fields in source and target as numerical values
             WITH differences AS (
@@ -111,7 +111,8 @@ export class CompanyRepository extends BaseRepository<Company> {
             FROM company c
             JOIN scored_targets st ON c.id = st.target_id
             ORDER BY st.score DESC
-            LIMIT ${limit || 'NULL'};
+            LIMIT ${limit || 'NULL'}
+            OFFSET ${offset || 'NULL'};
         `)
     }
 }

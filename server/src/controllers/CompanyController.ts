@@ -32,8 +32,8 @@ export class CompanyController {
     }
 
     @Get('/similar/:id')
-    async getSimilarCompanies(@Param('id') companyId: number, @QueryParam('limit') limit: number, @Req() req: Request, @Res() res: Response) {
-        const similarCompanies = await this.companyService.getSimilarCompanies(companyId, limit)
+    async getSimilarCompanies(@Param('id') companyId: number, @QueryParam('limit') limit: number, @QueryParam('offset') offset: number, @Req() req: Request, @Res() res: Response) {
+        const similarCompanies = await this.companyService.getSimilarCompanies(companyId, limit, offset)
         return res.status(200).send({
             companies: similarCompanies.map(({rank, ...company}) => ({rank, company}))
         })

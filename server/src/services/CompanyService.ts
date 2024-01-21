@@ -16,7 +16,7 @@ export class CompanyService {
         return await this.companyRepository.findByName(name)
     }
 
-    async getSimilarCompanies(companyId: number, limit?: number): Promise<Company & {rank: number}[]> {
-        return await this.companyRepository.findSimilar(companyId, limit)
+    async getSimilarCompanies(companyId: number, limit?: number, offset?: number): Promise<Company & {rank: number}[]> {
+        return await this.companyRepository.findSimilar(companyId, limit, offset)
     }
 }
