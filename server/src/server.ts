@@ -26,11 +26,10 @@ import path from 'path'
             classTransformer: true,
             routePrefix: `/${process.env.SERVER_ROUTES_PREFIX}`,
             controllers: [path.join(__dirname + '/controllers/*.{ts,js}')],
-            middlewares: [path.join(__dirname + '/middlewares/*.{ts,js}')],
+            // middlewares: [path.join(__dirname + '/middlewares/*.{ts,js}')],
         })
         app.listen(port)
         console.log(`[server]  Server is running at http://localhost:${port}`)
-
     } catch (error) {
         console.error(error)
         process.exit(1)
