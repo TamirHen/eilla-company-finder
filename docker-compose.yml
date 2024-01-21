@@ -1,7 +1,24 @@
 services:
+  client:
+    container_name: cf_client
+    build: ./client
+    depends_on:
+      - server
+    command: npm start
+    environment:
+      PORT: ${CLIENT_PORT}
+      NODE_ENV: development
+    ports:
+      - ${CLIENT_PORT}:${CLIENT_PORT}
+    working_dir: /client
+    volumes:
+      - ./client:/client
+    stdin_open: true
+    tty: true
+
   server:
     container_name: cf_server
-    build: .
+    build: ./server
     depends_on:
       - db
     command: npm run dev

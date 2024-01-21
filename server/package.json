@@ -1,5 +1,5 @@
 {
-  "name": "eilla-company-finder",
+  "name": "eilla-company-finder-express",
   "version": "1.0.0",
   "scripts": {
     "build": "tsc",
