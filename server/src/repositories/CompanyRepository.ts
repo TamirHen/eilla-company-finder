@@ -106,7 +106,7 @@ export class CompanyRepository extends BaseRepository<Company> {
                 FROM normalized_metrics nm
             )
             SELECT
-                RANK() OVER(ORDER BY st.score DESC) rank,
+                (RANK() OVER(ORDER BY st.score DESC))::INTEGER rank,
                 c.*
             FROM company c
             JOIN scored_targets st ON c.id = st.target_id
