@@ -30,9 +30,34 @@ export class CompanyRepository extends BaseRepository<Company> {
         })
     }
 
+    /**
+     * Scores and ranks the companies to get a sorted list from the most similar to the least by normalizing and weighting each relevant field:
+     * Industry: either 1 or 0 (same industry, different industry)
+     * Keywords: a number between 0-1 based on how many mutual keywords the companies have
+     * Employee Count: a number between 0-1 based on how close the number of employees to the source company (relative to the rest)
+     * Country: either 1 or 0 (same country, different country)
+     * Year Founded: a number between 0-1 based on how close the year founded to the source company (relative to the rest)
+     * Locality: either 1 or 0 (same locality, different locality)
+     *
+     * Every field gets weighted by how significant it is to find similarity, e.g. industry is more significant than year founded.
+     * This generates a numerical value representing the distance between the source company and each target company (Euclidean distance similarity measure).
+     *
+     * @param companyId
+     * @param limit
+     * @param offset
+     */
     async findSimilar(companyId: number, limit?: number, offset?: number): Promise<Company & {rank: number}[]> {
+
+        // ideally, all weights should sum up to 1 if you want "score" to be a number between 0-1
+        const INDUSTRY_WEIGHT = 0.4
+        const KEYWORDS_WEIGHT = 0.2
+        const EMPLOYEES_COUNT_WEIGHT = 0.15
+        const COUNTRY_WEIGHT = 0.2
+        const YEAR_FOUNDED_WEIGHT = 0.025
+        const LOCALITY_WEIGHT = 0.025
+
         return await this.manager.query(`
-            -- calc difference of fields in source and target as numerical values
+            -- FIRST HELPER: calc difference of fields in source and target as numerical values
             WITH differences AS (
                 SELECT s."name" source, 
                     s.id source_id, 
@@ -48,7 +73,7 @@ export class CompanyRepository extends BaseRepository<Company> {
                 JOIN company s ON t.id != s.id
                 AND s.id = ${companyId}
             ),
-            -- calc min max attributes of numericals fields to use in normalization formula
+            -- SECOND HELPER calc min max attributes of numerical fields to use in normalization formula
             mins_maxs_attrs AS (
                 SELECT
                     MIN(d.employee_diff) min_employee_diff,
@@ -57,7 +82,7 @@ export class CompanyRepository extends BaseRepository<Company> {
                     MAX(d.year_founded_diff) max_year_founded_diff
                 FROM differences d
             ),
-            -- calc for each company how many common keywords it has with the source company
+            -- THIRD HELPER calc for each company how many common keywords it has with the source company
             target_common_keywords AS (
                 SELECT
                     t.company_id AS target_id,
@@ -72,7 +97,7 @@ export class CompanyRepository extends BaseRepository<Company> {
                 GROUP BY
                     s.company_id, t.company_id
             ),
-            -- all metrics that's been taken into account to calc simularity are normalized into a number between 0-1
+            -- FORTH HELPER: all metrics that's been taken into account to calc similarity are normalized into a number between 0-1
             normalized_metrics AS (
                 SELECT 
                     d.source,
@@ -94,15 +119,15 @@ export class CompanyRepository extends BaseRepository<Company> {
                 FROM differences d
                 LEFT JOIN target_common_keywords tck ON d.target_id = tck.target_id
             ),
-            -- calc score between 0-1 based on assigning weight to each metric
+            -- FINAL QUERY: calc score between 0-1 based on assigning weight to each metric
             scored_targets AS (
                 SELECT nm.*,
-                        nm.normalized_industry_diff * 0.4 +
-                        nm.normalized_keywords_diff * 0.2 +
-                        nm.normalized_employee_count_diff * 0.15 +
-                        nm.normalized_country_diff * 0.2 +
-                        nm.normalized_year_founded_diff * 0.025 +
-                        nm.normalized_locality_diff * 0.025 AS score
+                        nm.normalized_industry_diff * ${INDUSTRY_WEIGHT} +
+                        nm.normalized_keywords_diff * ${KEYWORDS_WEIGHT} +
+                        nm.normalized_employee_count_diff * ${EMPLOYEES_COUNT_WEIGHT} +
+                        nm.normalized_country_diff * ${COUNTRY_WEIGHT} +
+                        nm.normalized_year_founded_diff * ${YEAR_FOUNDED_WEIGHT} +
+                        nm.normalized_locality_diff * ${LOCALITY_WEIGHT} AS score
                 FROM normalized_metrics nm
             )
             SELECT
