@@ -10,6 +10,7 @@ import {
 } from 'typeorm'
 import {Industry} from '@/models/Industry'
 import {Keyword} from '@/models/Keyword'
+import {Exclude, Transform, Type} from 'class-transformer'
 
 @Entity()
 export class Company {
@@ -21,8 +22,11 @@ export class Company {
     @Column()
     name: string
 
-    @ManyToOne(() => Industry, (industry) => industry.companies, {cascade: ['insert', 'update']})
-    industry: Industry
+    @Type(() => Industry)
+    // transforms industry to string on instanceToPlain()
+    @Transform(params => params.value.name, {toPlainOnly: true})
+    @ManyToOne(() => Industry, (industry) => industry.companies, {nullable: true, cascade: ['insert', 'update'], eager: true})
+    industry?: Industry
 
     @Column({nullable: true})
     websiteUrl?: string
@@ -48,13 +52,21 @@ export class Company {
     @Column({nullable: true})
     employeeCountEst?: number
 
-    @ManyToMany(() => Keyword)
+    @Type(() => Keyword)
+    // transforms keywords to strings on instanceToPlain()
+    @Transform(params => {
+        if (!params.value?.length) return []
+        return params.value.map((kw: Keyword) => kw.name)
+    }, {toPlainOnly: true})
+    @ManyToMany(() => Keyword, {eager: true})
     @JoinTable()
     keywords: Keyword[]
 
+    @Exclude()
     @CreateDateColumn()
     readonly createdAt: Date
 
+    @Exclude()
     @UpdateDateColumn()
     readonly updatedAt: Date
 

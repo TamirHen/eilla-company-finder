@@ -2,6 +2,8 @@ import {Get, JsonController, Param, QueryParam, Req, Res} from 'routing-controll
 import {CompanyService} from '@/services/CompanyService'
 import {Inject} from 'typedi'
 import {Request, Response} from 'express'
+import {instanceToInstance, instanceToPlain, plainToInstance} from 'class-transformer'
+import {Company} from '@/models/Company'
 
 @JsonController('/company')
 export class CompanyController {
@@ -13,7 +15,7 @@ export class CompanyController {
     async getSearchOptions(@Req() req: Request, @Res() res: Response) {
         const options = await this.companyService.getNames()
         return res.status(200).send({
-            options: options.sort()
+            options: options.sort(),
         })
 
     }
@@ -22,12 +24,12 @@ export class CompanyController {
     async getCompaniesByName(@QueryParam('name') name: string, @Req() req: Request, @Res() res: Response) {
         if (!name) {
             return res.status(200).send({
-                companies: []
+                companies: [],
             })
         }
         const companies = await this.companyService.getByName(name)
         return res.status(200).send({
-            companies
+            companies: instanceToPlain(companies)
         })
     }
 
@@ -35,7 +37,13 @@ export class CompanyController {
     async getSimilarCompanies(@Param('id') companyId: number, @QueryParam('limit') limit: number, @QueryParam('offset') offset: number, @Req() req: Request, @Res() res: Response) {
         const similarCompanies = await this.companyService.getSimilarCompanies(companyId, limit, offset)
         return res.status(200).send({
-            companies: similarCompanies.map(({rank, ...company}) => ({rank, company}))
+            companies: similarCompanies.map(({rank, ...company}) => ({
+                rank,
+                company: {
+                    ...company,
+                    keywords: company.keywords.map(kw => kw.name),
+                },
+            })),
         })
     }
 }

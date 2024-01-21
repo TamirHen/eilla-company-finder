@@ -2,6 +2,10 @@ import {Service} from 'typedi'
 import {Company} from '@/models/Company'
 import {BaseRepository} from '@/repositories/BaseRepository'
 import {Like} from 'typeorm'
+import {instanceToInstance, plainToInstance} from 'class-transformer'
+import {PlainObjectToNewEntityTransformer} from 'typeorm/query-builder/transformer/PlainObjectToNewEntityTransformer'
+import dataSource from '@/data-source'
+import {Keyword} from '@/models/Keyword'
 
 @Service()
 export class CompanyRepository extends BaseRepository<Company> {
@@ -46,7 +50,7 @@ export class CompanyRepository extends BaseRepository<Company> {
      * @param limit
      * @param offset
      */
-    async findSimilar(companyId: number, limit?: number, offset?: number): Promise<Company & {rank: number}[]> {
+    async findSimilar(companyId: number, limit?: number, offset?: number): Promise<(Company & { rank: number })[]> {
 
         // ideally, all weights should sum up to 1 if you want "score" to be a number between 0-1
         const INDUSTRY_WEIGHT = 0.4
@@ -56,7 +60,7 @@ export class CompanyRepository extends BaseRepository<Company> {
         const YEAR_FOUNDED_WEIGHT = 0.025
         const LOCALITY_WEIGHT = 0.025
 
-        return await this.manager.query(`
+        let companies = await this.manager.query(`
             -- FIRST HELPER: calc difference of fields in source and target as numerical values
             WITH differences AS (
                 SELECT s."name" source, 
@@ -119,7 +123,7 @@ export class CompanyRepository extends BaseRepository<Company> {
                 FROM differences d
                 LEFT JOIN target_common_keywords tck ON d.target_id = tck.target_id
             ),
-            -- FINAL QUERY: calc score between 0-1 based on assigning weight to each metric
+            -- FIFTH HELPER: calc score between 0-1 based on assigning weight to each metric
             scored_targets AS (
                 SELECT nm.*,
                         nm.normalized_industry_diff * ${INDUSTRY_WEIGHT} +
@@ -129,15 +133,48 @@ export class CompanyRepository extends BaseRepository<Company> {
                         nm.normalized_year_founded_diff * ${YEAR_FOUNDED_WEIGHT} +
                         nm.normalized_locality_diff * ${LOCALITY_WEIGHT} AS score
                 FROM normalized_metrics nm
+            ),
+            -- SIX HELPER: add the company's keywords
+            add_keywords AS (
+                SELECT
+                    c.id company_id,
+                    STRING_AGG(k."name", ',') AS keywords
+                FROM
+                    company c
+                JOIN
+                    company_keywords_keyword ckk ON c.id = ckk.company_id
+                JOIN
+                    keyword k ON ckk.keyword_id = k.id
+                GROUP BY
+                    c.id
             )
+            -- FINAL QUERY:
             SELECT
                 (RANK() OVER(ORDER BY st.score DESC))::INTEGER rank,
-                c.*
+                c.id,
+                c.name,
+                i."name" industry,
+                c.website_url "websiteUrl",
+                c.linkedin_url "linkedinUrl",
+                c.tagline,
+                c.about,
+                c.year_founded "yearFounded",
+                c.locality,
+                c.country,
+                c.employee_count_est "employeeCountEst",
+                ak.keywords "keywordsStr"
             FROM company c
             JOIN scored_targets st ON c.id = st.target_id
+            LEFT JOIN industry i ON c.industry_id = i.id
+            LEFT JOIN add_keywords ak ON ak.company_id = c.id
             ORDER BY st.score DESC
             LIMIT ${limit || 'NULL'}
             OFFSET ${offset || 'NULL'};
         `)
+
+        return companies.map(({keywordsStr, ...company}: Company & { keywordsStr: string }) => instanceToInstance({
+            ...company,
+            keywords: keywordsStr.split(',').map(kw => plainToInstance(Keyword, {name: kw})),
+        }))
     }
 }
