@@ -1,6 +1,14 @@
-import React, {ChangeEventHandler, FocusEventHandler, useState} from 'react';
+import React, {useState} from 'react';
 import './App.scss';
-import {Autocomplete, AutocompleteChangeReason, Button, Chip, CircularProgress, TextField} from '@mui/material'
+import _ from 'lodash'
+import {
+    Autocomplete,
+    Button,
+    CircularProgress,
+    FormControl, InputLabel, MenuItem,
+    Select,
+    TextField,
+} from '@mui/material'
 import {useQuery} from '@tanstack/react-query'
 import {getCompanyById, getSearchOptions, getSimilarCompanies} from './utils/api'
 import {CompanyOption, PaginateOptions} from './interfaces/options'
@@ -30,13 +38,18 @@ function App() {
         enabled: !!selectedOption,
     })
     const {
-        data: similarCompanies,
+        // similar companies response
+        data: scr,
         refetch: refetchSimilarCompanies,
         isFetching: isSimilarCompaniesLoading,
         error: similarCompaniesError,
     } = useQuery({
         queryKey: ['similarCompanies', selectedOption, paginateOptions],
-        placeholderData: [],
+        placeholderData: {
+            pageNumber: 1,
+            totalPages: 1,
+            companies: [],
+        },
         queryFn: () => getSimilarCompanies(selectedOption!.id, paginateOptions.pageSize, paginateOptions.pageNumber),
         enabled: !!(selectedOption && findSimilar),
     })
@@ -46,13 +59,13 @@ function App() {
         setFindSimilar(prev => false)
     }
 
-    const navigatePage = async (direction: 'next' | 'prev') => {
+    const navigatePageHandler = async (direction: 'next' | 'prev') => {
         setPaginateOptions(prevState => {
             let pageNumber = prevState.pageNumber
             if (direction === 'prev' && prevState.pageNumber > 1) {
                 pageNumber--
             }
-            if (direction === 'next') {
+            if (direction === 'next' && prevState.pageNumber < scr!.totalPages) {
                 pageNumber++
             }
             return {
@@ -63,7 +76,6 @@ function App() {
     }
 
     const findSimilarHandler = () => setFindSimilar(prev => true)
-    console.log(isSimilarCompaniesLoading)
     return (
         <main className="main">
             <div className="company-finder">
@@ -96,7 +108,7 @@ function App() {
             </div>
             <div className="similar-companies">
                 {selectedOption && <div className="similar-companies-header">
-                    <h2>Similar</h2>
+                    <h2>Results</h2>
                     <div className="inputs-wrapper">
                         <TextField
                             className="page-size-inpt"
@@ -109,18 +121,33 @@ function App() {
                             value={paginateOptions.pageSize}
                             InputProps={{inputProps: {min: 1}}}
                         />
-                        {paginateOptions.pageNumber > 1 && <Button variant="contained" onClick={() => navigatePage('prev')}
-                                 className="button move-btn">
-                            <BackIcon fontSize="large"/>
-                        </Button>}
-                        <Button variant="contained" onClick={() => navigatePage('next')}
-                                className="button move-btn">
-                            <NextIcon fontSize="large"/>
-                        </Button>
+                        <FormControl>
+                            <InputLabel id='page-select-label'>Page</InputLabel>
+                            <Select
+                                labelId="page-select-label"
+                                label="Page"
+                                className='page-select'
+                                onChange={(event) => setPaginateOptions(prev => ({...prev, pageNumber: Number(event.target.value) || 1}))}
+                                type={'number'}
+                                value={paginateOptions.pageNumber}
+                            >
+                                {_.range(1, scr!.totalPages + 1).map((page) => <MenuItem key={page} value={page}>{page}</MenuItem>)}
+                            </Select>
+                        </FormControl>
+                        {paginateOptions.pageNumber > 1 &&
+                            <Button variant="contained" onClick={() => navigatePageHandler('prev')}
+                                    className="button move-btn">
+                                <BackIcon fontSize="large"/>
+                            </Button>}
+                        {paginateOptions.pageNumber < scr!.totalPages &&
+                            <Button variant="contained" onClick={() => navigatePageHandler('next')}
+                                    className="button move-btn">
+                                <NextIcon fontSize="large"/>
+                            </Button>}
                     </div>
                 </div>}
                 <div className="results">
-                    {isSimilarCompaniesLoading ? <CircularProgress/> : similarCompanies?.map(companyRank =>
+                    {(isSimilarCompaniesLoading || !scr) ? <CircularProgress/> : scr.companies?.map(companyRank =>
                         <div className="ranked-company" key={companyRank.company.id}>
                             <CompanyCard company={companyRank.company}
                                          rank={companyRank.rank}/>

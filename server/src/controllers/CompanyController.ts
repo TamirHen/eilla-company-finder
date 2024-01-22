@@ -3,7 +3,6 @@ import {CompanyService} from '@/services/CompanyService'
 import {Inject} from 'typedi'
 import {Request, Response} from 'express'
 import {instanceToInstance, instanceToPlain, plainToInstance} from 'class-transformer'
-import {Company} from '@/models/Company'
 import _ from 'lodash'
 @JsonController('/company')
 export class CompanyController {
@@ -42,12 +41,21 @@ export class CompanyController {
 
 
     @Get('/similar/:id')
-    async getSimilarCompanies(@Param('id') companyId: number, @QueryParam('limit') limit: number, @QueryParam('offset') offset: number, @Req() req: Request, @Res() res: Response) {
+    async getSimilarCompanies(@Param('id') companyId: number, @QueryParam('limit') limit: number | undefined, @QueryParam('offset') offset: number | undefined, @Req() req: Request, @Res() res: Response) {
         const similarCompanies = await this.companyService.getSimilarCompanies(companyId, limit, offset)
         const fullCount = similarCompanies.length ? similarCompanies[0].fullCount : 0
+        let pageNumber: undefined | number
+        let totalPages: undefined | number
+        if (offset !== undefined && limit !== undefined) {
+            pageNumber = Math.floor(offset / limit) + 1
+        }
+        if (limit) {
+            totalPages = fullCount ? Math.ceil(fullCount/limit) : 1
+        }
+
         return res.status(200).send({
-            pageNumber: Math.floor(offset/limit) + 1,
-            totalPages: Math.ceil(fullCount/limit),
+            pageNumber,
+            totalPages,
             companies: similarCompanies.map(({rank, ...company}) => ({
                 rank,
                 company: {

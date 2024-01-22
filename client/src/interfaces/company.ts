@@ -13,6 +13,12 @@ export interface Company {
     keywords: string[]
 }
 
+export interface SimilarCompaniesResponse {
+    pageNumber: number
+    totalPages: number
+    companies: CompanyRank[]
+}
+
 export interface CompanyRank {
     rank: number
     company: Company
