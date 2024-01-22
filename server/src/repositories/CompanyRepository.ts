@@ -62,7 +62,7 @@ export class CompanyRepository extends BaseRepository<Company> {
      * @param limit
      * @param offset
      */
-    async findSimilar(companyId: number, limit?: number, offset?: number): Promise<(Company & { rank: number })[]> {
+    async findSimilar(companyId: number, limit?: number, offset?: number): Promise<(Company & { rank: number, fullCount: number })[]> {
 
         // ideally, all weights should sum up to 1 if you want "score" to be a number between 0-1
         const INDUSTRY_WEIGHT = 0.4
@@ -174,7 +174,8 @@ export class CompanyRepository extends BaseRepository<Company> {
                 c.locality,
                 c.country,
                 c.employee_count_est "employeeCountEst",
-                ak.keywords "keywordsStr"
+                ak.keywords "keywordsStr",
+                COUNT(*) OVER() "fullCount"
             FROM company c
             JOIN scored_targets st ON c.id = st.target_id
             LEFT JOIN industry i ON c.industry_id = i.id
@@ -184,7 +185,7 @@ export class CompanyRepository extends BaseRepository<Company> {
             OFFSET ${offset || 'NULL'};
         `)
 
-        return companies.map(({keywordsStr, ...company}: Company & { keywordsStr: string }) => instanceToInstance({
+        return companies.map(({keywordsStr, ...company}: Company & { keywordsStr: string, fullCount: number }) => instanceToInstance({
             ...company,
             keywords: keywordsStr ? keywordsStr.split(',').map(kw => plainToInstance(Keyword, {name: kw})) : [],
         }))
