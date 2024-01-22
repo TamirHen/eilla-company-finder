@@ -1,30 +1,110 @@
 .main {
-  min-height: 80vh;
-  color: white;
+  height: 100vh;
+  min-height: 600px;
   display: flex;
   align-items: start;
   justify-content: space-between;
-  gap: 20px;
+  overflow: auto;
 
-  .search-bar {
-    padding-left: 15%;
-    margin: auto 0;
-    width: 40%;
-    align-self: center;
+  .company-finder {
+    height: inherit;
+    min-height: inherit;
+    overflow: auto;
+    // set scroller to left side
+    direction: rtl;
+
+    * {
+      direction: ltr;
+    }
+
+    padding: 100px 40px 50px 3%;
+    flex: 1;
 
     h1 {
       font-size: 60px;
       color: #3399FF;
-      margin-bottom: 15px;
+      margin-bottom: 30px;
+    }
+
+    .search-wrapper {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+
+      .search-input {
+        flex-grow: 1;
+        max-width: 340px;
+      }
+
+    }
+
+    .company-details {
+      margin-top: 50px;
     }
   }
 
-  .company-details {
-    width: 50%;
+  .button {
+    flex-shrink: 1;
+    background: linear-gradient(to right bottom, #007FFF, #007FFF 120%);
+    box-shadow: none;
+    text-transform: none;
+    font-size: 18px;
+    color: white;
+  }
+
+  .similar-companies {
+    flex: 1;
+    height: 100vh;
     min-height: inherit;
-    background: white;
-    border-left: 1px solid #1F262E;
-    border-bottom: 1px solid #1F262E;
-    border-bottom-left-radius: 15px;
+    overflow: auto;
+    background-color: #F4F6F8;
+    border-left: 1px solid;
+    border-bottom: 1px solid;
+    border-color: #E5EAF2FF;
+    position: relative;
+
+    .similar-companies-header {
+      width: calc(100% - 15px);
+      position: absolute;
+      align-self: flex-start;
+      color: #3399FF;
+      font-size: 36px;
+      padding: 10px 5%;
+      background: inherit;
+      display: flex;
+      justify-content: space-between;
+
+      .inputs-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .page-size-inpt {
+          max-width: 120px;
+        }
+
+        .move-btn {
+          min-width: unset;
+          height: 45px;
+          width: 45px;
+        }
+      }
+    }
+
+    .results {
+      height: 100%;
+      overflow: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 40px;
+      padding: 100px 5% 50px 5%;
+
+
+      .ranked-company {
+        flex-grow: 1;
+        width: 100%;
+      }
+    }
   }
 }

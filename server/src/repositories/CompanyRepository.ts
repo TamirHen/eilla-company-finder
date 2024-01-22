@@ -6,6 +6,7 @@ import {instanceToInstance, plainToInstance} from 'class-transformer'
 import {PlainObjectToNewEntityTransformer} from 'typeorm/query-builder/transformer/PlainObjectToNewEntityTransformer'
 import dataSource from '@/data-source'
 import {Keyword} from '@/models/Keyword'
+import {FindOneOptions} from 'typeorm/find-options/FindOneOptions'
 
 @Service()
 export class CompanyRepository extends BaseRepository<Company> {
@@ -14,7 +15,7 @@ export class CompanyRepository extends BaseRepository<Company> {
     }
 
     async findOptions(query?: string): Promise<{ id: number, label: string }[]> {
-        const companyNamesAndIds = await this.find({
+        const companyOptions = await this.find({
             select: {
                 id: true,
                 name: true,
@@ -24,10 +25,17 @@ export class CompanyRepository extends BaseRepository<Company> {
             },
         })
 
-        return companyNamesAndIds.map(({id, name}) => ({
+        return companyOptions.map(({id, name}) => ({
             id,
             label: name
         }))
+    }
+
+    async findById(id: number, options?: FindOneOptions<Company>): Promise<Company | null> {
+        return await this.findOne({
+            ...options,
+            where: {id},
+        })
     }
 
     async findByName(name: string): Promise<Company[]> {
@@ -178,7 +186,7 @@ export class CompanyRepository extends BaseRepository<Company> {
 
         return companies.map(({keywordsStr, ...company}: Company & { keywordsStr: string }) => instanceToInstance({
             ...company,
-            keywords: keywordsStr.split(',').map(kw => plainToInstance(Keyword, {name: kw})),
+            keywords: keywordsStr ? keywordsStr.split(',').map(kw => plainToInstance(Keyword, {name: kw})) : [],
         }))
     }
 }

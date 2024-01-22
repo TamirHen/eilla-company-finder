@@ -13,7 +13,7 @@ export interface Company {
     keywords: string[]
 }
 
-export interface CompanyOption {
-    id: number
-    label: string
+export interface CompanyRank {
+    rank: number
+    company: Company
 }

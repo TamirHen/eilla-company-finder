@@ -19,6 +19,13 @@ export class CompanyController {
         })
 
     }
+    @Get('/:id')
+    async getCompanyById(@Param('id') id: number, @Req() req: Request, @Res() res: Response) {
+        const company = await this.companyService.getById(id)
+        return res.status(200).send({
+            company: instanceToPlain(company)
+        })
+    }
 
     @Get('/')
     async getCompaniesByName(@QueryParam('name') name: string, @Req() req: Request, @Res() res: Response) {
@@ -32,6 +39,7 @@ export class CompanyController {
             companies: instanceToPlain(companies)
         })
     }
+
 
     @Get('/similar/:id')
     async getSimilarCompanies(@Param('id') companyId: number, @QueryParam('limit') limit: number, @QueryParam('offset') offset: number, @Req() req: Request, @Res() res: Response) {
