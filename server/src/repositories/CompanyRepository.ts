@@ -13,9 +13,10 @@ export class CompanyRepository extends BaseRepository<Company> {
         super(Company);
     }
 
-    async findNames(query?: string): Promise<string[]> {
-        const companyNames = await this.find({
+    async findOptions(query?: string): Promise<{ id: number, label: string }[]> {
+        const companyNamesAndIds = await this.find({
             select: {
+                id: true,
                 name: true,
             },
             where: {
@@ -23,7 +24,10 @@ export class CompanyRepository extends BaseRepository<Company> {
             },
         })
 
-        return companyNames.map(company => company.name)
+        return companyNamesAndIds.map(({id, name}) => ({
+            id,
+            label: name
+        }))
     }
 
     async findByName(name: string): Promise<Company[]> {

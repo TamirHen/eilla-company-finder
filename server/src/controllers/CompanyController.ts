@@ -4,7 +4,7 @@ import {Inject} from 'typedi'
 import {Request, Response} from 'express'
 import {instanceToInstance, instanceToPlain, plainToInstance} from 'class-transformer'
 import {Company} from '@/models/Company'
-
+import _ from 'lodash'
 @JsonController('/company')
 export class CompanyController {
 
@@ -13,9 +13,9 @@ export class CompanyController {
 
     @Get('/options')
     async getSearchOptions(@Req() req: Request, @Res() res: Response) {
-        const options = await this.companyService.getNames()
+        const options = await this.companyService.getOptions()
         return res.status(200).send({
-            options: options.sort(),
+            options: _.sortBy(options, 'label'),
         })
 
     }
@@ -41,7 +41,7 @@ export class CompanyController {
                 rank,
                 company: {
                     ...company,
-                    keywords: company.keywords.map(kw => kw.name),
+                    keywords: company.keywords?.map(kw => kw.name) || [],
                 },
             })),
         })

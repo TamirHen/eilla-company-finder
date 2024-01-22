@@ -5,6 +5,8 @@ import {Container} from 'typeorm-typedi-extensions'
 import dataSource from './data-source'
 import express from "express"
 import {useExpressServer} from "routing-controllers"
+import cors from 'cors'
+
     ;
 import path from 'path'
 
@@ -21,6 +23,7 @@ import path from 'path'
 
         const port: number = Number(process.env.SERVER_PORT)
         const app = express()
+        app.use(cors())
         app.use(express.json());
         useExpressServer(app, {
             classTransformer: true,

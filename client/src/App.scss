@@ -1,3 +1,30 @@
 .main {
+  min-height: 80vh;
+  color: white;
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 20px;
 
+  .search-bar {
+    padding-left: 15%;
+    margin: auto 0;
+    width: 40%;
+    align-self: center;
+
+    h1 {
+      font-size: 60px;
+      color: #3399FF;
+      margin-bottom: 15px;
+    }
+  }
+
+  .company-details {
+    width: 50%;
+    min-height: inherit;
+    background: white;
+    border-left: 1px solid #1F262E;
+    border-bottom: 1px solid #1F262E;
+    border-bottom-left-radius: 15px;
+  }
 }

@@ -1,21 +1,4 @@
 services:
-  client:
-    container_name: cf_client
-    build: ./client
-    depends_on:
-      - server
-    command: npm start
-    environment:
-      PORT: ${CLIENT_PORT}
-      NODE_ENV: development
-    ports:
-      - ${CLIENT_PORT}:${CLIENT_PORT}
-    working_dir: /client
-    volumes:
-      - ./client:/client
-    stdin_open: true
-    tty: true
-
   server:
     container_name: cf_server
     build: ./server
@@ -52,5 +35,25 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
+
+  client:
+    container_name: cf_client
+    build: ./client
+    depends_on:
+      - server
+    command: npm start
+    environment:
+      PORT: ${CLIENT_PORT}
+      REACT_APP_SERVER_PORT: ${SERVER_PORT}
+      REACT_APP_SERVER_HOST: ${SERVER_HOST}
+      NODE_ENV: development
+    ports:
+      - ${CLIENT_PORT}:${CLIENT_PORT}
+    working_dir: /client
+    volumes:
+      - ./client:/client
+    stdin_open: true
+    tty: true
+
 volumes:
   data:

@@ -8,8 +8,8 @@ export class CompanyService {
     @Inject()
     private companyRepository: CompanyRepository
 
-    async getNames(query?: string) {
-        return await this.companyRepository.findNames(query)
+    async getOptions(query?: string) {
+        return await this.companyRepository.findOptions(query)
     }
 
     async getByName(name: string) {
