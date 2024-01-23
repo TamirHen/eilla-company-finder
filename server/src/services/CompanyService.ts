@@ -17,8 +17,8 @@ export class CompanyService {
         return await this.companyRepository.findById(id)
     }
 
-    async getByName(name: string) {
-        return await this.companyRepository.findByName(name)
+    async getByNameQuery(name: string, caseSensitive = false) {
+        return await this.companyRepository.findByNameQuery(name, caseSensitive)
     }
 
     async getSimilarCompanies(companyId: number, limit?: number, offset?: number) {

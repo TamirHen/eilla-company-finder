@@ -25,7 +25,7 @@ function App() {
         data: searchedCompany
     } = useQuery({
         queryKey: ['company', selectedOption],
-        queryFn: () => getCompanyById(selectedOption!.id),
+        queryFn: () => getCompanyById(selectedOption!.companyId),
         enabled: !!selectedOption,
     })
     const {
@@ -39,7 +39,7 @@ function App() {
             totalPages: 1,
             companies: [],
         },
-        queryFn: () => getSimilarCompanies(selectedOption!.id, pagination.pageSize, pagination.pageNumber),
+        queryFn: () => getSimilarCompanies(selectedOption!.companyId, pagination.pageSize, pagination.pageNumber),
         enabled: !!(selectedOption && findSimilar),
     })
 
@@ -90,7 +90,7 @@ function App() {
                             value={selectedOption}
                             renderInput={params => <TextField label={'Search'} {...params}/>}
                             renderOption={(props, option) =>
-                                <li {...props} key={option.id}>
+                                <li {...props} key={option.companyId}>
                                     {option.label}
                                 </li>}
                         />

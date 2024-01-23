@@ -1,4 +1,4 @@
-import {Get, JsonController, Param, QueryParam, Req, Res} from 'routing-controllers'
+import {Get, JsonController, NotFoundError, Param, QueryParam, Req, Res} from 'routing-controllers'
 import {CompanyService} from '@/services/CompanyService'
 import {Inject} from 'typedi'
 import {Request, Response} from 'express'
@@ -21,19 +21,20 @@ export class CompanyController {
     @Get('/:id')
     async getCompanyById(@Param('id') id: number, @Req() req: Request, @Res() res: Response) {
         const company = await this.companyService.getById(id)
+        if (!company) throw new NotFoundError(`Company with id ${id} not found`)
         return res.status(200).send({
             company: instanceToPlain(company)
         })
     }
 
     @Get('/')
-    async getCompaniesByName(@QueryParam('name') name: string, @Req() req: Request, @Res() res: Response) {
+    async getCompaniesByName(@QueryParam('name') name: string, @QueryParam('caseSensitive') caseSensitive = false, @Req() req: Request, @Res() res: Response) {
         if (!name) {
             return res.status(200).send({
                 companies: [],
             })
         }
-        const companies = await this.companyService.getByName(name)
+        const companies = await this.companyService.getByNameQuery(name, caseSensitive)
         return res.status(200).send({
             companies: instanceToPlain(companies)
         })

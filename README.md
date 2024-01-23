@@ -40,3 +40,4 @@ Seed the database from the companies CSV file
 docker exec cf_server npm run seed
 ```
 
+## Test API directly

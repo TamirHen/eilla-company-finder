@@ -1,5 +1,5 @@
 export interface CompanyOption {
-    id: number
+    companyId: number
     label: string
 }
 

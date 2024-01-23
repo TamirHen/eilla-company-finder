@@ -12,7 +12,7 @@ export class CompanyRepository extends BaseRepository<Company> {
         super(Company);
     }
 
-    async findOptions(query?: string): Promise<{ id: number, label: string }[]> {
+    async findOptions(query?: string): Promise<{ companyId: number, label: string }[]> {
         const companyOptions = await this.find({
             select: {
                 id: true,
@@ -24,7 +24,7 @@ export class CompanyRepository extends BaseRepository<Company> {
         })
 
         return companyOptions.map(({id, name}) => ({
-            id,
+            companyId: id,
             label: name
         }))
     }
@@ -36,12 +36,16 @@ export class CompanyRepository extends BaseRepository<Company> {
         })
     }
 
-    async findByName(name: string): Promise<Company[]> {
-        return await this.find({
-            where: {
-                name,
-            },
-        })
+    async findByNameQuery(query: string, caseSensitive = false): Promise<Company[]> {
+        return await this.createQueryBuilder('company')
+            .where(
+                caseSensitive ?
+                    "company.name LIKE :name" :
+                    "LOWER(company.name) LIKE LOWER(:name)",
+                {
+                    name: `%${query}%`,
+                })
+            .getMany()
     }
 
     /**
