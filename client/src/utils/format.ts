@@ -31,7 +31,7 @@ export function titleCase(str: string) {
 
 /**
  * Adds https:// if it's missing
- * E.g. linkedin.com https://linkedin.com
+ * E.g. linkedin.com => https://linkedin.com
  */
 export function formatBrokenLink(link: string) {
     if (!link.includes('http')) {
