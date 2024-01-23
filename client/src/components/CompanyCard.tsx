@@ -50,7 +50,7 @@ const CompanyCard = ({company, rank}: Props) => {
                     <EmployeesIcon/>
                     {nFormatter(company.employeeCountEst, 0)}
                 </div>}
-                {company.employeeCountEst && <div className="info-box">
+                {company.yearFounded && <div className="info-box">
                     <div>SINCE</div>
                     {company.yearFounded}
                 </div>}

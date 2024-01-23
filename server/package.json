@@ -4,7 +4,8 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon -L -r tsconfig-paths/register src/server.ts",
-    "typeorm": "typeorm-ts-node-commonjs",
+    "migrate": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:run -d src/data-source.ts",
+    "init:db": "ts-node -r tsconfig-paths/register node_modules/typeorm/cli.js migration:generate src/migrations/init -d src/data-source.ts",
     "seed": "ts-node -r tsconfig-paths/register src/seeds/companies.ts"
   },
   "repository": {
@@ -39,7 +40,7 @@
     "@types/node": "^16.11.10",
     "@types/papaparse": "^5.3.14",
     "nodemon": "^3.0.2",
-    "ts-node": "10.7.0",
+    "ts-node": "^10.7.0",
     "tsconfig-paths": "^4.2.0",
     "typescript": "4.5.2"
   }

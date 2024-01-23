@@ -75,7 +75,11 @@ function App() {
         })
     }
 
-    const findSimilarHandler = () => setFindSimilar(prev => true)
+    const findSimilarHandler = () => {
+        setFindSimilar(prev => true)
+        // make sure pageNumber is one on a second search
+        setPaginateOptions(prev => ({...prev, pageNumber: 1}))
+    }
     return (
         <main className="main">
             <div className="company-finder">

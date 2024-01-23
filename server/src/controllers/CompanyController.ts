@@ -14,7 +14,7 @@ export class CompanyController {
     async getSearchOptions(@Req() req: Request, @Res() res: Response) {
         const options = await this.companyService.getOptions()
         return res.status(200).send({
-            options: _.sortBy(options, 'label'),
+            options: _.sortBy(options, option => option.label.toLowerCase()),
         })
 
     }

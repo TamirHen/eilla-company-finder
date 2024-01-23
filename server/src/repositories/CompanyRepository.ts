@@ -65,12 +65,12 @@ export class CompanyRepository extends BaseRepository<Company> {
     async findSimilar(companyId: number, limit?: number, offset?: number): Promise<(Company & { rank: number, fullCount: number })[]> {
 
         // ideally, all weights should sum up to 1 if you want "score" to be a number between 0-1
-        const INDUSTRY_WEIGHT = 0.4
-        const KEYWORDS_WEIGHT = 0.2
-        const EMPLOYEES_COUNT_WEIGHT = 0.15
-        const COUNTRY_WEIGHT = 0.2
-        const YEAR_FOUNDED_WEIGHT = 0.025
-        const LOCALITY_WEIGHT = 0.025
+        const INDUSTRY_WEIGHT = 0.375
+        const KEYWORDS_WEIGHT = 0.275
+        const EMPLOYEES_COUNT_WEIGHT = 0.1
+        const COUNTRY_WEIGHT = 0.15
+        const YEAR_FOUNDED_WEIGHT = 0.05
+        const LOCALITY_WEIGHT = 0.05
 
         let companies = await this.manager.query(`
             -- FIRST HELPER: calc difference of fields in source and target as numerical values
@@ -187,6 +187,7 @@ export class CompanyRepository extends BaseRepository<Company> {
 
         return companies.map(({keywordsStr, ...company}: Company & { keywordsStr: string, fullCount: number }) => instanceToInstance({
             ...company,
+            // mapping the keywords from a string to Keyword[] entities
             keywords: keywordsStr ? keywordsStr.split(',').map(kw => plainToInstance(Keyword, {name: kw})) : [],
         }))
     }
