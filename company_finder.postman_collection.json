@@ -1,0 +1,125 @@
+{
+	"info": {
+		"_postman_id": "5cb890a6-05b9-435b-837b-9b79984332c8",
+		"name": "Eilla Company Finder",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19562308"
+	},
+	"item": [
+		{
+			"name": "Get Similar Companies",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:4005/api/company/similar/1?offset=0&limit=10",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "4005",
+					"path": [
+						"api",
+						"company",
+						"similar",
+						"1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "0"
+						},
+						{
+							"key": "limit",
+							"value": "10"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Companies By Name",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:4005/api/company?name=amazon&caseSensitive=false",
+					"host": [
+						"localhost"
+					],
+					"port": "4005",
+					"path": [
+						"api",
+						"company"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "amazon"
+						},
+						{
+							"key": "caseSensitive",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Company By Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:4005/api/company/1",
+					"host": [
+						"localhost"
+					],
+					"port": "4005",
+					"path": [
+						"api",
+						"company",
+						"1"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "1500",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Search Options",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:4005/api/company/options",
+					"host": [
+						"localhost"
+					],
+					"port": "4005",
+					"path": [
+						"api",
+						"company",
+						"options"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "1500",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
