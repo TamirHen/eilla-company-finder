@@ -3,8 +3,6 @@ import {Company} from '@/models/Company'
 import {BaseRepository} from '@/repositories/BaseRepository'
 import {Like} from 'typeorm'
 import {instanceToInstance, plainToInstance} from 'class-transformer'
-import {PlainObjectToNewEntityTransformer} from 'typeorm/query-builder/transformer/PlainObjectToNewEntityTransformer'
-import dataSource from '@/data-source'
 import {Keyword} from '@/models/Keyword'
 import {FindOneOptions} from 'typeorm/find-options/FindOneOptions'
 
@@ -57,10 +55,6 @@ export class CompanyRepository extends BaseRepository<Company> {
      *
      * Every field gets weighted by how significant it is to find similarity, e.g. industry is more significant than year founded.
      * This generates a numerical value representing the distance between the source company and each target company (Euclidean distance similarity measure).
-     *
-     * @param companyId
-     * @param limit
-     * @param offset
      */
     async findSimilar(companyId: number, limit?: number, offset?: number): Promise<(Company & { rank: number, fullCount: number })[]> {
 

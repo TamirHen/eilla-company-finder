@@ -9,11 +9,11 @@
     height: inherit;
     min-height: inherit;
     overflow: auto;
-    // set scroller to left side
-    direction: rtl;
     padding: 100px 40px 50px 3%;
     width: 50%;
 
+    // set scroller to the left hand side
+    direction: rtl;
     * {
       direction: ltr;
     }

@@ -7,7 +7,6 @@ import {ReactComponent as LinkedinIcon} from '../assets/linkedin.svg';
 import {ReactComponent as LinkIcon} from '../assets/link.svg';
 import {formatBrokenLink, nFormatter, titleCase} from '../utils/format'
 
-
 interface Props {
     company: Company
     rank?: number
@@ -16,7 +15,9 @@ interface Props {
 const CompanyCard = ({company, rank}: Props) => {
 
     const renderChip = (label: string) => <Chip className="data-chip" key={label} label={label}/>
-    const renderEndSection = !!(company.employeeCountEst || company.websiteUrl || company.linkedinUrl || company.yearFounded)
+    // display the icon section (with the links, number of employees and year founded) only if one of the fields is defined
+    const renderIconSection = !!(company.employeeCountEst || company.websiteUrl || company.linkedinUrl || company.yearFounded)
+    // locality includes country in it, so only if locality is not defined render country
     const location = company.locality || company.country || undefined
 
     return (
@@ -43,14 +44,14 @@ const CompanyCard = ({company, rank}: Props) => {
                     </div>
                 </div> : <></>}
             </div>
-            {renderEndSection && <div className="card-info-end">
+            {renderIconSection && <div className="card-icon-section">
                 {company.websiteUrl && <a href={formatBrokenLink(company.websiteUrl)} target="_blank"><LinkIcon/></a>}
                 {company.linkedinUrl && <a href={formatBrokenLink(company.linkedinUrl)} target="_blank"><LinkedinIcon/></a>}
-                {company.employeeCountEst && <div className="info-box">
+                {company.employeeCountEst && <div className="icon-box-multiline">
                     <EmployeesIcon/>
                     {nFormatter(company.employeeCountEst, 0)}
                 </div>}
-                {company.yearFounded && <div className="info-box">
+                {company.yearFounded && <div className="icon-box-multiline">
                     <div>SINCE</div>
                     {company.yearFounded}
                 </div>}

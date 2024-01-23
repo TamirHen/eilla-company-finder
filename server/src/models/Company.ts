@@ -4,7 +4,6 @@ import {
     Entity,
     Index, JoinTable, ManyToMany,
     ManyToOne,
-    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn,
 } from 'typeorm'
@@ -23,7 +22,7 @@ export class Company {
     name: string
 
     @Type(() => Industry)
-    // transforms industry to string on instanceToPlain()
+    // transforms Industry to string on instanceToPlain()
     @Transform(params => params.value.name, {toPlainOnly: true})
     @ManyToOne(() => Industry, (industry) => industry.companies, {nullable: true, cascade: ['insert', 'update'], eager: true})
     industry?: Industry
@@ -53,7 +52,7 @@ export class Company {
     employeeCountEst?: number
 
     @Type(() => Keyword)
-    // transforms keywords to strings on instanceToPlain()
+    // transforms Keyword[] to string[] on instanceToPlain()
     @Transform(params => {
         if (!params.value?.length) return []
         return params.value.map((kw: Keyword) => kw.name)

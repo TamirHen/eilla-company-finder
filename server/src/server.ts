@@ -13,7 +13,7 @@ import path from 'path'
 (async () => {
 
     try {
-        // set up containers for TypeDI (dependency injection)
+        // register typedi containers for dependency injection
         useOrmContainer(Container)
         useRoutingControllerContainer(Container)
 
@@ -29,7 +29,6 @@ import path from 'path'
             classTransformer: true,
             routePrefix: `/${process.env.SERVER_ROUTES_PREFIX}`,
             controllers: [path.join(__dirname + '/controllers/*.{ts,js}')],
-            // middlewares: [path.join(__dirname + '/middlewares/*.{ts,js}')],
         })
         app.listen(port)
         console.log(`[server]  Server is running at http://localhost:${port}`)
@@ -37,5 +36,4 @@ import path from 'path'
         console.error(error)
         process.exit(1)
     }
-
 })()

@@ -2,7 +2,7 @@ import {Get, JsonController, Param, QueryParam, Req, Res} from 'routing-controll
 import {CompanyService} from '@/services/CompanyService'
 import {Inject} from 'typedi'
 import {Request, Response} from 'express'
-import {instanceToInstance, instanceToPlain, plainToInstance} from 'class-transformer'
+import {instanceToPlain} from 'class-transformer'
 import _ from 'lodash'
 @JsonController('/company')
 export class CompanyController {

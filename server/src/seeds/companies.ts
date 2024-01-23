@@ -23,6 +23,10 @@ interface Row {
     'keywords': string
 }
 
+/**
+ * Read resource CSV file.
+ * Convert the rows into entities and inject them into the database in bulks.
+ */
 (async () => {
     console.log('Reading rows from CSV file...')
     const csvFilePath = path.resolve(__dirname, '../resources/companies_data.csv')
@@ -47,7 +51,7 @@ async function injectRows(rows: Row[]): Promise<void> {
     await dataSource.initialize()
 
     console.log('Preparing data to be inserted in bulks...')
-    // remove duplicates and covert string industries into entities
+    // remove duplicates and convert string industries into entities
     let industries =
         _.uniq(
             rows.map(row => row.industry?.trim(),
@@ -57,7 +61,7 @@ async function injectRows(rows: Row[]): Promise<void> {
             .map(industry => plainToInstance(Industry, {name: industry}))
 
 
-    // split comma seperated keywords, remove duplicates, and covert string keywords into entities
+    // split comma-seperated keywords, remove duplicates, and convert string keywords into entities
     let keywords =
         _.uniq(
             _.flatten(
@@ -81,20 +85,18 @@ async function injectRows(rows: Row[]): Promise<void> {
         skipUpdateIfNoValuesChanged: true,
     })
 
-    // set entities in map structures where key is name and value is entity
+    // set entities in a hash map structures where key is name and value is entity
     industries = await dataSource.getRepository(Industry).find()
     const industriesMap = _.keyBy(industries, industry => industry.name)
     keywords = await dataSource.getRepository(Keyword).find()
     const keywordsMap = _.keyBy(keywords, keyword => keyword.name)
 
     let companies: Company[] = []
-    console.log('Mapping rows into models...')
+    console.log('Mapping rows to entities...')
     for (const row of rows) {
-
-        // converting row keywords to entities
+        // convert comma-seperated keywords to entities
         const keywordEntities = stringToArray(row.keywords, ',').map(keyword => keywordsMap[keyword])
-
-        // convert row to company
+        // convert row to Company entity
         companies.push(plainToInstance(Company, {
             name: row.company_name,
             industry: row.industry ? industriesMap[row.industry.trim()] : null,
@@ -111,7 +113,6 @@ async function injectRows(rows: Row[]): Promise<void> {
     }
     console.log('Saving companies into the database...')
     await dataSource.getRepository(Company).save(companies)
-
 }
 
 

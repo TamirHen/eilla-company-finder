@@ -1,14 +1,7 @@
 import React, {useState} from 'react';
 import './App.scss';
 import _ from 'lodash'
-import {
-    Autocomplete,
-    Button,
-    CircularProgress,
-    FormControl, InputLabel, MenuItem,
-    Select,
-    TextField,
-} from '@mui/material'
+import {Autocomplete, Button, CircularProgress, FormControl, InputLabel, MenuItem, Select, TextField} from '@mui/material'
 import {useQuery} from '@tanstack/react-query'
 import {getCompanyById, getSearchOptions, getSimilarCompanies} from './utils/api'
 import {CompanyOption, PaginateOptions} from './interfaces/options'
@@ -19,7 +12,7 @@ import BackIcon from '@mui/icons-material/ArrowBack';
 
 function App() {
     const [selectedOption, setSelectedOption] = useState<CompanyOption | null>(null)
-    const [paginateOptions, setPaginateOptions] = useState<PaginateOptions>({
+    const [pagination, setPagination] = useState<PaginateOptions>({
         pageNumber: 1,
         pageSize: 10,
     })
@@ -29,38 +22,38 @@ function App() {
         queryFn: getSearchOptions,
     })
     const {
-        data: company,
-        isLoading: isCompanyLoading,
-        error: companyError,
+        data: searchedCompany
     } = useQuery({
         queryKey: ['company', selectedOption],
         queryFn: () => getCompanyById(selectedOption!.id),
         enabled: !!selectedOption,
     })
     const {
-        // similar companies response
+        // scr- similar companies response
         data: scr,
-        refetch: refetchSimilarCompanies,
-        isFetching: isSimilarCompaniesLoading,
-        error: similarCompaniesError,
+        isFetching: isSimilarCompaniesLoading
     } = useQuery({
-        queryKey: ['similarCompanies', selectedOption, paginateOptions],
+        queryKey: ['similarCompanies', selectedOption, pagination],
         placeholderData: {
             pageNumber: 1,
             totalPages: 1,
             companies: [],
         },
-        queryFn: () => getSimilarCompanies(selectedOption!.id, paginateOptions.pageSize, paginateOptions.pageNumber),
+        queryFn: () => getSimilarCompanies(selectedOption!.id, pagination.pageSize, pagination.pageNumber),
         enabled: !!(selectedOption && findSimilar),
     })
 
-    const loadCompanyHandler = (event: React.SyntheticEvent, newOption: CompanyOption | null) => {
+    // when company is selected in the Autocomplete selectedOption state changes and useQuery invokes API call to fetch the searched company
+    const companySearchedHandler = (event: React.SyntheticEvent, newOption: CompanyOption | null) => {
         setSelectedOption(prev => newOption)
+
+        // if second search is performed and similar companies are mounted, unmount similar companies
         setFindSimilar(prev => false)
     }
 
+    // handle similar companies pagination
     const navigatePageHandler = async (direction: 'next' | 'prev') => {
-        setPaginateOptions(prevState => {
+        setPagination(prevState => {
             let pageNumber = prevState.pageNumber
             if (direction === 'prev' && prevState.pageNumber > 1) {
                 pageNumber--
@@ -75,11 +68,13 @@ function App() {
         })
     }
 
+    // Change findSimilar state which causes useQuery to invoke API call to fetch similar companies
     const findSimilarHandler = () => {
         setFindSimilar(prev => true)
-        // make sure pageNumber is one on a second search
-        setPaginateOptions(prev => ({...prev, pageNumber: 1}))
+        // reset pagination to first page
+        setPagination(prev => ({...prev, pageNumber: 1}))
     }
+
     return (
         <main className="main">
             <div className="company-finder">
@@ -91,7 +86,7 @@ function App() {
                         <Autocomplete
                             options={options || []}
                             className={'search-input'}
-                            onChange={loadCompanyHandler}
+                            onChange={companySearchedHandler}
                             value={selectedOption}
                             renderInput={params => <TextField label={'Search'} {...params}/>}
                             renderOption={(props, option) =>
@@ -99,14 +94,14 @@ function App() {
                                     {option.label}
                                 </li>}
                         />
-                        {company && <Button onClick={findSimilarHandler} className="button" variant="contained">
+                        {searchedCompany && <Button onClick={findSimilarHandler} className="button" variant="contained">
                             Find Similar
                             <ArrowForwardIcon fontSize="small"/>
                         </Button>}
                     </div>
-                    {company &&
+                    {searchedCompany &&
                         <div className="company-details">
-                            <CompanyCard company={company}/>
+                            <CompanyCard company={searchedCompany}/>
                         </div>}
                 </div>
             </div>
@@ -118,11 +113,11 @@ function App() {
                             className="page-size-inpt"
                             type={'number'}
                             label="Page size"
-                            onChange={event => setPaginateOptions(prev => ({
+                            onChange={event => setPagination(prev => ({
                                 ...prev,
                                 pageSize: Number(event.target.value) > 1 ? Number(event.target.value) : 1,
                             }))}
-                            value={paginateOptions.pageSize}
+                            value={pagination.pageSize}
                             InputProps={{inputProps: {min: 1}}}
                         />
                         <FormControl>
@@ -131,19 +126,19 @@ function App() {
                                 labelId="page-select-label"
                                 label="Page"
                                 className='page-select'
-                                onChange={(event) => setPaginateOptions(prev => ({...prev, pageNumber: Number(event.target.value) || 1}))}
+                                onChange={(event) => setPagination(prev => ({...prev, pageNumber: Number(event.target.value) || 1}))}
                                 type={'number'}
-                                value={paginateOptions.pageNumber}
+                                value={pagination.pageNumber}
                             >
                                 {_.range(1, scr!.totalPages + 1).map((page) => <MenuItem key={page} value={page}>{page}</MenuItem>)}
                             </Select>
                         </FormControl>
-                        {paginateOptions.pageNumber > 1 &&
+                        {pagination.pageNumber > 1 &&
                             <Button variant="contained" onClick={() => navigatePageHandler('prev')}
                                     className="button move-btn">
                                 <BackIcon fontSize="large"/>
                             </Button>}
-                        {paginateOptions.pageNumber < scr!.totalPages &&
+                        {pagination.pageNumber < scr!.totalPages &&
                             <Button variant="contained" onClick={() => navigatePageHandler('next')}
                                     className="button move-btn">
                                 <NextIcon fontSize="large"/>
