@@ -20,13 +20,14 @@ services:
     working_dir: /server
     volumes:
       - ./server:/server
+      - /server/node_modules
     stdin_open: true
     tty: true
 
   db:
     container_name: cf_postgres
     image: postgres:15-alpine
-    restart: always
+    restart: unless-stopped
     ports:
       - ${DB_HOST_PORT}:${DB_PORT}
     volumes:
@@ -52,6 +53,7 @@ services:
     working_dir: /client
     volumes:
       - ./client:/client
+      - /client/node_modules
     stdin_open: true
     tty: true
 
