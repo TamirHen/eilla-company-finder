@@ -5,7 +5,7 @@
 
 
 ## Getting started
-- Clone the repo
+Clone the repo
 ```shell
 git clone https://github.com/TamirHen/eilla-company-finder.git
 ```
