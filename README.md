@@ -3,7 +3,7 @@
 ## Pre-requisites
 
 - [docker](https://www.docker.com/)
-
+- [docker compose](https://docs.docker.com/compose/install/)
 
 ## Getting started
 
