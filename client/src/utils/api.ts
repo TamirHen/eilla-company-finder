@@ -1,9 +1,8 @@
-import {Company, CompanyRank, SimilarCompaniesResponse} from '../interfaces/company'
+import {Company, SimilarCompaniesResponse} from '../interfaces/company'
 import axios from 'axios'
 import {CompanyOption} from '../interfaces/options'
 
 const API_BASE_URL = `${process.env.REACT_APP_SERVER_HOST}:${process.env.REACT_APP_SERVER_PORT}/api`
-
 export async function getSearchOptions(): Promise<CompanyOption[]> {
     try {
         const response = await axios.get(
@@ -16,7 +15,6 @@ export async function getSearchOptions(): Promise<CompanyOption[]> {
     }
     return []
 }
-
 export async function getCompanyById(id: number): Promise<Company | null> {
     try {
         const response = await axios.get(
@@ -29,7 +27,6 @@ export async function getCompanyById(id: number): Promise<Company | null> {
     }
     return null
 }
-
 export async function getSimilarCompanies(id: number, limit = 10, page = 1): Promise<SimilarCompaniesResponse> {
     try {
         const response = await axios.get(

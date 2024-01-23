@@ -1,3 +1,7 @@
+/**
+ * Formats number to a short string.
+ * E.g. 1000 => 1k
+ */
 export function nFormatter(num: number, digits: number) {
     const lookup = [
         { value: 1, symbol: "" },
@@ -13,6 +17,10 @@ export function nFormatter(num: number, digits: number) {
     return item ? (num / item.value).toFixed(digits).replace(regexp, "").concat(item.symbol) : "0";
 }
 
+/**
+ * Formats string to titleCase.
+ * E.g. hello world => Hello World
+ */
 export function titleCase(str: string) {
     const splitStr = str.toLowerCase().split(' ');
     for (let i = 0; i < splitStr.length; i++) {
@@ -21,6 +29,10 @@ export function titleCase(str: string) {
     return splitStr.join(' ');
 }
 
+/**
+ * Adds https:// if it's missing
+ * E.g. linkedin.com https://linkedin.com
+ */
 export function formatBrokenLink(link: string) {
     if (!link.includes('http')) {
         return 'https://'+ link
