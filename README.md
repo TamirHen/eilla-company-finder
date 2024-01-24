@@ -43,7 +43,7 @@ docker exec cf_server npm run seed
 ```
 
 ## Frontend
-The frontend is a React App written in TypeScript, and constructed using [Create React App](https://create-react-app.dev/).\
+The frontend is a React app written in TypeScript, and constructed using [Create React App](https://create-react-app.dev/).\
 It defaults to run at http://localhost:3005 if nothing is changed in the `.env` file.
 
 ## Backend
