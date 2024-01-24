@@ -42,13 +42,17 @@ Seed the database from the companies CSV file
 docker exec cf_server npm run seed
 ```
 
-**The program is now running on localhost:3005 and localhost:4005 for the frontend and backend respectively (or any other ports if changed in the .env file)**
+## Frontend
+The frontend is a React App written in TypeScript, and constructed using [Create React App](https://create-react-app.dev/).\
+It defaults to run at http://localhost:3005 if nothing is changed in the `.env` file.
 
-## Test API directly
-There's a Postman collection in the root of this repo with all the available routes already set up.
+## Backend
+The backend is an Express.js app written in TypeScript. It defaults to run at http://localhost:4005/api if nothing is changed in the `.env` file.\
+It connects to a PostgreSQL database using [TypeORM](https://typeorm.io/).\
+The backend follows the Repository design pattern and uses dependency injection to allow abstraction between its layers (Repository, Service, Controller).\
+There's a Postman collection in the root of this repo `company_finder.postman_collection.json` which includes all the routes:
 
-## Routes
-
+**vars are noted with {braces} 
 ### [GET] Get Similar Companies
 ```shell
 http://localhost:{port}/api/company/similar/{companyId}?offset={offset}&limit={limit}
@@ -68,3 +72,20 @@ http://localhost:{port}/api/company/{companyId}
 ```shell
 http://localhost:{port}/api/company/options
 ```
+
+## Database
+The database used in this project is PostgreSQL.\
+The default connection configurations are as follows:
+```
+DB_USER=postgres
+DB_PASSWORD=secret
+DB_NAME=companiesfinder
+DB_HOST=127.0.0.1
+DB_HOST_PORT=5433
+```
+It contains 5 tables: \
+`company`\
+`keyword` \
+`industry` \
+`company_keywords_keyword` - many-to-many junction table \
+`migrations` - managed by TypeORM 
