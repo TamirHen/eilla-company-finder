@@ -52,7 +52,7 @@ It connects to a PostgreSQL database using [TypeORM](https://typeorm.io/).\
 The backend follows the Repository design pattern and uses dependency injection to allow abstraction between its layers (Repository, Service, Controller).\
 There's a Postman collection in the root of this repo `company_finder.postman_collection.json` which includes all the routes:
 
-**vars are noted with {braces} 
+**vars are noted with `{braces}`
 ### [GET] Get Similar Companies
 ```shell
 http://localhost:{port}/api/company/similar/{companyId}?offset={offset}&limit={limit}
